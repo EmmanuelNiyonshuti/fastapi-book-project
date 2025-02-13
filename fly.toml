@@ -1,0 +1,44 @@
+# fly.toml file for your FastAPI + Nginx project
+
+app = "fastapi-book-project"
+
+[build]
+  image = "emmanueln/fastapi-nginx-app:latest"
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+  
+
+  [services.ports]
+    port = 80
+    handlers = ["http"]
+
+  [services.docker]
+    image = "emmanueln/fastapi-nginx-app:latest"  # Replace with your image name
+    force_build = true
+
+
+  [services.env]
+    FASTAPI_HOST = "0.0.0.0"
+    FASTAPI_PORT = "8000"
+
+[[services]]
+  internal_port = 80
+  protocol = "tcp"
+  
+  # Expose port 80 for HTTP traffic to Nginx
+  [services.ports]
+    port = 80
+    handlers = ["http"]
+
+  # Define Docker configuration for the Nginx service
+  [services.docker]
+    image = "nginx:alpine"
+    force_build = true  # Forces a build of the image
+    volumes = ["./nginx.conf:/etc/nginx/nginx.conf:ro"]
+
+  # Define the Nginx environment configuration
+  [services.env]
+    NGINX_HOST = "0.0.0.0"
+    NGINX_PORT = "80"
